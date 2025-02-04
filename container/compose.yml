@@ -1,0 +1,67 @@
+name: aerospike-redis-compare
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - "6381:6379"
+
+  redis-app:
+    build:
+      context: ../
+      dockerfile: container/redis-app/Dockerfile
+    container_name: redis-app-container
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6381
+    command: ["npx", "tsc", "&&", "node", "dist/main"]
+    volumes:
+      - ../source/redis-app:/usr/src/app
+    working_dir: /usr/src/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 250M
+        reservations:
+          cpus: "0.25"
+          memory: 152M
+
+  aerospike:
+    image: aerospike/aerospike-server:latest
+    container_name: aerospike-container
+    ports:
+      - "3004:3000"
+      - "3001:3001"
+      - "3002:3002"
+      - "3003:3003"
+
+  aerospike-app:
+    build:
+      context: ../
+      dockerfile: container/aerospike-app/Dockerfile
+    container_name: aerospike-app-container
+    depends_on:
+      - aerospike
+    environment:
+      - AEROSPIKE_HOST=aerospike
+      - AEROSPIKE_PORT=3004
+    command: ["npx", "tsc", "&&", "node", "dist/main"]
+    volumes:
+      - ../source/aerospike-app:/usr/src/app
+    working_dir: /usr/src/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 250M
+        reservations:
+          cpus: "0.25"
+          memory: 152M
