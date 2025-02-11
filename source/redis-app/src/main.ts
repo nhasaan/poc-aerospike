@@ -14,7 +14,7 @@ async function testRedisPerformance() {
 
   console.log(`Value fetched from Redis: ${result}`);
 
-  redisConnection.disconnect();
+  // redisConnection.disconnect();
 }
 
 testRedisPerformance().catch(console.error);

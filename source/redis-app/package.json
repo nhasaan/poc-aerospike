@@ -5,8 +5,8 @@
   "scripts": {
     "build": "swc src -d dist",
     "build:watch": "swc src -d dist -w",
-    "start": "node dist/index.js",
-    "dev": "npm run build && npm run start",
+    "start": "node dist/main.js",
+    "dev": "yarn build && yarn start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

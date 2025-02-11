@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY source/redis-app/package*.json source/redis-app/*.lock ./
-RUN npm install
+RUN yarn install
 
 # Copy the app source code
 COPY source/redis-app .

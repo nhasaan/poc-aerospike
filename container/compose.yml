@@ -45,10 +45,7 @@ services:
     container_name: aerospike-app
     depends_on:
       - aerospike
-    environment:
-      - AEROSPIKE_HOST=aerospike
-      - AEROSPIKE_PORT=3004
-    command: ["node", "dist/main.js"]
+    # command: ["node", "dist/main.js"]
     volumes:
       - ../source/aerospike-app:/usr/src/app
     working_dir: /usr/src/app
