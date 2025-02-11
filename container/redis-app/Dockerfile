@@ -5,14 +5,14 @@ FROM node:20.11-alpine
 WORKDIR /usr/src/app
 
 # Install app dependencies
-COPY source/redis-app/package*.json ./
+COPY source/redis-app/package*.json source/redis-app/*.lock ./
 RUN npm install
 
 # Copy the app source code
 COPY source/redis-app .
 
 # Compile TypeScript code
-RUN npx tsc
+RUN yarn build
 
 # Command to run the app
-# CMD ["node", "dist/main.js"]
+# CMD ["yarn", "start"]

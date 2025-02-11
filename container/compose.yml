@@ -5,19 +5,16 @@ services:
     image: redis:latest
     container_name: redis-container
     ports:
-      - "6381:6379"
+      - "0.0.0.0:6381:6379"
 
   redis-app:
     build:
       context: ../
       dockerfile: container/redis-app/Dockerfile
-    container_name: redis-app-container
+    container_name: redis-app
     depends_on:
       - redis
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6381
-    command: ["npx", "tsc", "&&", "node", "dist/main"]
+    command: ["node", "dist/main.js"]
     volumes:
       - ../source/redis-app:/usr/src/app
     working_dir: /usr/src/app
@@ -36,22 +33,22 @@ services:
     image: aerospike/aerospike-server:latest
     container_name: aerospike-container
     ports:
-      - "3004:3000"
-      - "3001:3001"
-      - "3002:3002"
-      - "3003:3003"
+      - "0.0.0.0:3004:3000"
+      - "0.0.0.0:3001:3001"
+      - "0.0.0.0:3002:3002"
+      - "0.0.0.0:3003:3003"
 
   aerospike-app:
     build:
       context: ../
       dockerfile: container/aerospike-app/Dockerfile
-    container_name: aerospike-app-container
+    container_name: aerospike-app
     depends_on:
       - aerospike
     environment:
       - AEROSPIKE_HOST=aerospike
       - AEROSPIKE_PORT=3004
-    command: ["npx", "tsc", "&&", "node", "dist/main"]
+    command: ["node", "dist/main.js"]
     volumes:
       - ../source/aerospike-app:/usr/src/app
     working_dir: /usr/src/app
