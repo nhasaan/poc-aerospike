@@ -1,61 +1,83 @@
-name: aerospike-redis-compare
+name: aerospike-benchmarks-app
 
 services:
-  redis:
-    image: redis:latest
-    container_name: redis-container
-    ports:
-      - "0.0.0.0:6381:6379"
-
-  redis-app:
+  app:
     build:
       context: ../
-      dockerfile: container/redis-app/Dockerfile
-    container_name: redis-app
+      dockerfile: container/benchmarks-app/Dockerfile
+    container_name: benchmarks-app
+    environment:
+      - NODE_ENV=development
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AEROSPIKE_HOST=aerospike
+      - AEROSPIKE_PORT=3000
     depends_on:
-      - redis
-    command: ["node", "dist/main.js"]
+      redis:
+        condition: service_healthy
+      aerospike:
+        condition: service_healthy
     volumes:
-      - ../source/redis-app:/usr/src/app
-    working_dir: /usr/src/app
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ../source/benchmarks-app:/app/source
+      - ../source/benchmarks-app/node_modules:/app/source/node_modules
+    networks:
+      - benchmarks-net
+    command: yarn start
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-server
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - benchmarks-net
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 250M
+          memory: 1G
         reservations:
-          cpus: "0.25"
-          memory: 152M
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   aerospike:
-    image: aerospike/aerospike-server:latest
-    container_name: aerospike-container
+    image: aerospike/aerospike-server:6.4.0.7
+    container_name: aerospike-server
     ports:
-      - "0.0.0.0:3004:3000"
-      - "0.0.0.0:3001:3001"
-      - "0.0.0.0:3002:3002"
-      - "0.0.0.0:3003:3003"
-
-  aerospike-app:
-    build:
-      context: ../
-      dockerfile: container/aerospike-app/Dockerfile
-    container_name: aerospike-app
-    depends_on:
-      - aerospike
-    # command: ["node", "dist/main.js"]
+      - "3003:3000"
+      - "3001:3001"
+      - "3002:3002"
     volumes:
-      - ../source/aerospike-app:/usr/src/app
-    working_dir: /usr/src/app
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - aerospike-data:/opt/aerospike/data
+      - ./aerospike.conf:/opt/aerospike/etc/aerospike.conf
+    networks:
+      - benchmarks-net
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 250M
+          memory: 1G
         reservations:
-          cpus: "0.25"
-          memory: 152M
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "asinfo", "-v", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  benchmarks-net:
+    name: benchmarks-net
+    driver: bridge
+
+volumes:
+  redis-data:
+    name: redis-data
+  aerospike-data:
+    name: aerospike-data

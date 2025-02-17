@@ -1,5 +1,5 @@
 import Aerospike from "aerospike";
-import { config } from "../config";
+import { config } from "../config/app-config";
 import { logger } from "../loggers";
 
 const aerospikeConfig = {
