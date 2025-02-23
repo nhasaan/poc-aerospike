@@ -1,83 +1,213 @@
-POC on Aerospike vs Redis Performance
+# Redis vs Aerospike Performance Benchmark
 
-This project is a proof-of-concept (POC) to compare the performance of Aerospike and Redis for caching and database operations.
+A comprehensive performance comparison between Redis and Aerospike databases using TypeScript and Docker.
 
-Prerequisites
+![Architecture Overview](./docs/images/architecture.svg)
 
-Install Docker and Docker Compose
+## Table of Contents
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Benchmark Operations](#benchmark-operations)
+- [Results](#results)
+- [Monitoring](#monitoring)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
-Getting Started
+## Overview
 
-Navigate to the root of the project:
+This project provides a containerized benchmark environment to compare the performance characteristics of Redis and Aerospike in various operations including:
+- Single key operations (SET/GET)
+- Batch operations
+- Different data sizes
+- Concurrent access patterns
 
-cd /path/to/project/root
+## Architecture
 
-Start the containers:
+```mermaid
+graph TD
+    subgraph Benchmark Environment
+        B[Benchmark Service]
+        R[Redis Container]
+        A[Aerospike Container]
+        B -->|Test| R
+        B -->|Test| A
+    end
+    subgraph Volumes
+        RV[Redis Data]
+        AV[Aerospike Data]
+        R --> RV
+        A --> AV
+    end
+    subgraph Monitoring
+        M[Docker Stats]
+        B -->|Metrics| M
+        R -->|Metrics| M
+        A -->|Metrics| M
+    end
+```
 
-docker compose -f ./container/compose.yml up --build
+## Prerequisites
 
-This command will build and start the following services:
+- Docker Engine 20.10+
+- Docker Compose v2.0+
+- Node.js 18+ (for local development)
+- 4GB RAM minimum
+- 10GB free disk space
 
-Services
+## Installation
 
-Redis: Runs a Redis instance on port 6381 (mapped from 6379 inside the container).
+1. Clone the repository:
+```bash
+git clone https://github.com/nhassan/redis-aerospike-benchmark.git
+cd redis-aerospike-benchmark
+```
 
-Redis App: A Node.js application that connects to the Redis instance.
+2. Start the containers:
+```bash
+docker compose up --build
+```
 
-Aerospike: Runs an Aerospike instance on ports 3004, 3001, 3002, and 3003.
+## Configuration
 
-Aerospike App: A Node.js application that connects to the Aerospike instance.
+### Environment Variables
 
-Configuration
+```env
+REDIS_HOST=redis
+REDIS_PORT=6379
+AEROSPIKE_HOST=aerospike
+AEROSPIKE_PORT=3000
+```
 
-Redis
+### Resource Limits
 
-Host: redis
+Each service has the following resource allocations:
 
-Port: 6381
+```yaml
+limits:
+  cpu: 0.5
+  memory: 250M
+reservations:
+  cpu: 0.25
+  memory: 152M
+```
 
-Aerospike
+### Service Configurations
 
-Host: aerospike
+#### Redis
+- Port: 6379 (internal)
+- Persistence: Enabled (appendonly)
+- Protocol: Redis Serialization Protocol (RESP)
 
-Port: 3004
+#### Aerospike
+- Primary Port: 3000
+- Mesh Port: 3001
+- Info Port: 3002
+- Storage Engine: Memory
+- Namespace: test
 
-Volume Mapping
+## Usage
 
-The source code for each application is mapped to /usr/src/app inside the container:
+### Starting the Benchmark
 
-../source/redis-app:/usr/src/app
+```bash
+# Start all services
+docker compose up --build
 
-../source/aerospike-app:/usr/src/app
+# Run specific benchmark
+docker compose exec benchmark npm run benchmark
+```
 
-Resource Allocation
+### Stopping Services
 
-Each application container has resource limits and reservations:
+```bash
+# Stop and remove containers
+docker compose down
 
-Limits:
+# Stop and remove containers + volumes
+docker compose down -v
+```
 
-CPU: 0.5
+## Benchmark Operations
 
-Memory: 250M
+The benchmark includes the following tests:
 
-Reservations:
+1. **Single Operations**
+   - SET operations
+   - GET operations
+   - DELETE operations
 
-CPU: 0.25
+2. **Batch Operations**
+   - Batch GET (1000 keys)
+   - Batch SET (1000 keys)
 
-Memory: 152M
+3. **Data Size Tests**
+   - Small payloads (100 bytes)
+   - Medium payloads (1 KB)
+   - Large payloads (10 KB)
 
-Stopping the Containers
+## Results
 
-To stop and remove the running containers, use:
+Results are displayed in a table format showing:
+- Operations per second
+- Average latency
+- Total execution time
+- Memory usage
 
-   docker compose -f ./container/compose.yml down
+Example output:
+```
+Running SET benchmarks...
+Database   | Ops/sec  | Avg Latency (ms) | Total Time (s)
+-----------|----------|------------------|---------------
+Redis      | 95,000   | 0.0105          | 10.52
+Aerospike  | 85,000   | 0.0117          | 11.76
+```
 
-Notes
+![Benchmark Overview](./docs/images/benchmark.png)
 
-The extra_hosts entry allows access to host.docker.internal, enabling communication with the host machine.
+## Monitoring
 
-The depends_on ensures that the database services (redis, aerospike) start before their respective applications.
+Monitor performance metrics using:
 
-License
+```bash
+# View container stats
+docker stats
 
-This project is licensed under the MIT License.
+# View service logs
+docker compose logs benchmark
+docker compose logs redis
+docker compose logs aerospike
+```
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. **Connection Refused**
+   - Check if services are running: `docker compose ps`
+   - Verify network connectivity: `docker network inspect benchmark-network`
+
+2. **Memory Issues**
+   - Increase Docker memory limit
+   - Check container logs for OOM errors
+
+3. **Performance Issues**
+   - Verify host system resources
+   - Check for resource contention
+   - Review Docker Desktop settings
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit your changes: `git commit -m 'Add some AmazingFeature'`
+4. Push to the branch: `git push origin feature/AmazingFeature`
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

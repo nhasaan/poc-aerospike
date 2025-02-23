@@ -1,4 +1,4 @@
-/source/main/node_modules
-/source/main/dist
-/source/main/logs
+/source/*/node_modules
+/source/*/dist
+/source/*/logs
 *.md
