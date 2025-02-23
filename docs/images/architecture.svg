@@ -1,0 +1,41 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="600" fill="#f8f9fa"/>
+    
+    <!-- Title -->
+    <text x="400" y="50" text-anchor="middle" font-size="24" font-weight="bold" fill="#212529">
+        Benchmark Architecture
+    </text>
+
+    <!-- Docker Environment Box -->
+    <rect x="100" y="100" width="600" height="400" fill="#e9ecef" rx="10"/>
+    <text x="120" y="130" font-size="18" fill="#495057">Docker Environment</text>
+
+    <!-- Benchmark Service -->
+    <rect x="150" y="170" width="200" height="100" fill="#fff" stroke="#0866FF" stroke-width="2" rx="5"/>
+    <text x="250" y="220" text-anchor="middle" font-size="16" fill="#0866FF">Benchmark Service</text>
+    <text x="250" y="240" text-anchor="middle" font-size="12" fill="#6c757d">TypeScript + Node.js</text>
+
+    <!-- Redis -->
+    <rect x="150" y="350" width="120" height="80" fill="#fff" stroke="#DC382D" stroke-width="2" rx="5"/>
+    <text x="210" y="395" text-anchor="middle" font-size="16" fill="#DC382D">Redis</text>
+
+    <!-- Aerospike -->
+    <rect x="530" y="350" width="120" height="80" fill="#fff" stroke="#C41E3A" stroke-width="2" rx="5"/>
+    <text x="590" y="395" text-anchor="middle" font-size="16" fill="#C41E3A">Aerospike</text>
+
+    <!-- Connection Lines -->
+    <line x1="250" y1="270" x2="210" y2="350" stroke="#6c757d" stroke-width="2"/>
+    <line x1="350" y1="270" x2="590" y2="350" stroke="#6c757d" stroke-width="2"/>
+
+    <!-- Volumes -->
+    <rect x="150" y="450" width="120" height="30" fill="#fff" stroke="#6c757d" stroke-width="2" rx="5"/>
+    <text x="210" y="470" text-anchor="middle" font-size="12" fill="#6c757d">Redis Volume</text>
+
+    <rect x="530" y="450" width="120" height="30" fill="#fff" stroke="#6c757d" stroke-width="2" rx="5"/>
+    <text x="590" y="470" text-anchor="middle" font-size="12" fill="#6c757d">Aerospike Volume</text>
+
+    <!-- Volume Connections -->
+    <line x1="210" y1="430" x2="210" y2="450" stroke="#6c757d" stroke-width="2"/>
+    <line x1="590" y1="430" x2="590" y2="450" stroke="#6c757d" stroke-width="2"/>
+</svg>

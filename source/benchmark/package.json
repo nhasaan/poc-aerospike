@@ -1,0 +1,20 @@
+{
+  "name": "database-benchmark",
+  "version": "1.0.0",
+  "description": "Redis vs Aerospike benchmark",
+  "main": "dist/benchmark.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "node dist/benchmark.js",
+    "benchmark": "npm run build && npm start"
+  },
+  "dependencies": {
+    "aerospike": "^5.8.0",
+    "dotenv": "^16.4.7",
+    "redis": "^4.6.13"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}
